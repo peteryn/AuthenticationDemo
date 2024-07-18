@@ -34,6 +34,44 @@
 			</div>
 		</section>
 
+		<section class="pb-3 pt-5 text-center">
+			<h1>Log In</h1>
+		</section>
+
+		<section class="px-5 pb-3 text-center d-flex justify-content-center">
+			<form action="/login" method="post" class="w-50" id="logInForm">
+				<div class="mb-3 text-start">
+					<label for="emailForLogin" class="form-label">Email</label>
+					<input type="email" class="form-control" id="emailForLogin" name="email" />
+				</div>
+				<div class="mb-3 text-start">
+					<label for="passwordForLogin" class="form-label">Password</label>
+					<input type="password" class="form-control" id="passwordForLogin" name="password" />
+				</div>
+				<button type="submit" class="btn btn-primary">Submit</button>
+			</form>
+		</section>
+
+		<script>
+			// const form = document.getElementById("logInForm");
+			// form.addEventListener(("submit"), (e) => {
+			// 	e.preventDefault();
+			// 	const email = document.getElementById("emailForLogin").value;
+			// 	const pw = document.getElementById("passwordForLogin").value;
+			// 	fetch("/login", {
+			// 		method: "POST",
+			// 		headers: {
+			// 			"Content-Type": "application/x-www-form-urlencoded"
+			// 		},
+			// 		body: `email=${email}&password=${pw}`,
+			// 		redirect: "follow"
+			// 	}).then(res => {
+			//
+			// 	});
+			// 	console.log("Done?");
+			//
+			// });
+		</script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	</body>
 </html>

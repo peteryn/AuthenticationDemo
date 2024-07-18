@@ -16,4 +16,8 @@ public class UserService {
     public boolean registerUser(User user) {
         return userRepository.insert(user);
     }
+
+    public boolean loginUser(User user) {
+        return userRepository.checkUserCredentials(user);
+    }
 }

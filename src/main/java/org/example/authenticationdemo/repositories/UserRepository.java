@@ -24,4 +24,12 @@ public class UserRepository {
         }
         return result;
     }
+
+    public boolean checkUserCredentials(User user) {
+        String sql = "SELECT * FROM users WHERE email = '" + user.getEmail() + "' AND password = '"  + user.getPassword() + "'";
+        System.out.println("sql: " + sql);
+        User returned = jdbcTemplate.queryForObject(sql, (rs, row) -> new User(rs.getString("email"), rs.getString("password")));
+        System.out.println(returned);
+        return returned != null;
+    }
 }
