@@ -3,7 +3,6 @@ package org.example.authenticationdemo.controllers;
 import org.example.authenticationdemo.models.User;
 import org.example.authenticationdemo.services.UserService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,10 +24,15 @@ public class HomeController {
 
     @GetMapping("/")
     public String home() {
-        return "home";
+        return "login";
     }
 
-    @PostMapping("/")
+    @GetMapping("/register")
+    public String register() {
+        return "register";
+    }
+
+    @PostMapping("/register")
     public String registerUser(
             @RequestParam String email,
             @RequestParam String password,
@@ -38,7 +42,7 @@ public class HomeController {
         String message = "Status: ";
         message += success ? "Success!" : "Failure";
         model.addAttribute("message", message);
-        return "home";
+        return "register";
     }
 
     @GetMapping("/login")
