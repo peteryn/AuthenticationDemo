@@ -1,10 +1,12 @@
 package org.example.authenticationdemo.controllers;
 
+import org.apache.commons.codec.binary.Hex;
 import org.example.authenticationdemo.models.User;
 import org.example.authenticationdemo.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -38,7 +40,8 @@ public class HomeController {
             @RequestParam String password,
             Model model
     ) {
-        boolean success = userService.registerUser(new User(email, password));
+        String hashedPass = DigestUtils.md5DigestAsHex(password.getBytes());
+        boolean success = userService.registerUser(new User(email, hashedPass));
         String message = "Status: ";
         message += success ? "Success!" : "Failure";
         model.addAttribute("message", message);
@@ -58,7 +61,8 @@ public class HomeController {
         String decoded = new String(Base64.getDecoder().decode(encoded.getBytes()));
         String email = decoded.split(":")[0];
         String password = decoded.split(":")[1];
-        boolean loginSuccess = userService.loginUser(new User(email, password));
+        String hashedPass = DigestUtils.md5DigestAsHex(password.getBytes());
+        boolean loginSuccess = userService.loginUser(new User(email, hashedPass));
         if (loginSuccess) {
             return new ModelAndView("profile", HttpStatus.OK);
         } else {

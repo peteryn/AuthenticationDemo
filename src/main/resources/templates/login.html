@@ -51,7 +51,6 @@
 
 					const emailPass = `${email}:${pw}`;
 					const base64encoding = btoa(emailPass);
-					console.log(`Encoding is ${base64encoding}`);
 
 					fetch("/login", {
 						method: "POST",
