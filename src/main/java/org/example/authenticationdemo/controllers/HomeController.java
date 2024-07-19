@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.Base64;
+
 @Controller
 public class HomeController {
 
@@ -46,9 +48,12 @@ public class HomeController {
 
     @PostMapping("/login")
     public ModelAndView login(
-            @RequestParam String email,
-            @RequestParam String password
+            @RequestHeader("Authorization") String authString
     ) {
+        String encoded = authString.split(" ")[1];
+        String decoded = new String(Base64.getDecoder().decode(encoded.getBytes()));
+        String email = decoded.split(":")[0];
+        String password = decoded.split(":")[1];
         boolean loginSuccess = userService.loginUser(new User(email, password));
         if (loginSuccess) {
             return new ModelAndView("profile", HttpStatus.OK);
