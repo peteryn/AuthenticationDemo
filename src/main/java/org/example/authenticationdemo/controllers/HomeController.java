@@ -36,7 +36,7 @@ public class HomeController {
         String message = "Status: ";
         message += success ? "Success!" : "Failure";
         model.addAttribute("message", message);
-        return "home.html";
+        return "home";
     }
 
     @GetMapping("/login")
@@ -49,26 +49,11 @@ public class HomeController {
             @RequestParam String email,
             @RequestParam String password
     ) {
-        System.out.println("email " + email);
-        System.out.println("password " + password);
         boolean loginSuccess = userService.loginUser(new User(email, password));
         if (loginSuccess) {
             return new ModelAndView("profile", HttpStatus.OK);
         } else {
             return new ModelAndView("unauthorized", HttpStatus.UNAUTHORIZED);
         }
-    }
-
-    @GetMapping("/profile")
-    public ModelAndView profile(
-            @RequestHeader(value = "Authorization", required = false) String authHeader
-    ) {
-        if (authHeader == null) {
-            return new ModelAndView("unauthorized", HttpStatus.UNAUTHORIZED  );
-        } else {
-            System.out.println(authHeader);
-            return new ModelAndView("profile", HttpStatus.OK  );
-        }
-
     }
 }
