@@ -1,6 +1,7 @@
 package org.example.authenticationdemo.controllers;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.logging.log4j.message.Message;
 import org.example.authenticationdemo.models.User;
 import org.example.authenticationdemo.services.UserService;
 import org.springframework.http.HttpStatus;
@@ -13,15 +14,19 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.Base64;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
+import java.util.*;
 
 @Controller
 public class HomeController {
 
     private final UserService userService;
+    private final SecureRandom secureRandom;
 
     public HomeController(UserService userService) {
         this.userService = userService;
+        this.secureRandom = new SecureRandom();
     }
 
     @GetMapping("/")
@@ -40,11 +45,36 @@ public class HomeController {
             @RequestParam String password,
             Model model
     ) {
-        String hashedPass = DigestUtils.md5DigestAsHex(password.getBytes());
-        boolean success = userService.registerUser(new User(email, hashedPass));
+        byte[] salt = new byte[64];
+        secureRandom.nextBytes(salt);
+        byte[] passwordBytes = password.getBytes();
+        byte[] saltPassword = new byte[salt.length + passwordBytes.length];
+        System.arraycopy(passwordBytes, 0, saltPassword, 0, passwordBytes.length);
+        System.arraycopy(salt, 0, saltPassword, passwordBytes.length, salt.length);
+
+        Base64.Encoder encoder = Base64.getEncoder();
+
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("MD5");
+        } catch (Exception e) {
+            model.addAttribute("message", "Failure");
+            return "register";
+        }
+
+        byte[] hashedAndSaltedBytes = md.digest(saltPassword);
+        String encodedPassword = encoder.encodeToString(hashedAndSaltedBytes);
+        String encodedSalt = encoder.encodeToString(salt);
+
+        System.out.println("Email: " + email);
+        System.out.println("encodedPassword: " + encodedPassword);
+        System.out.println("encodedSalt: " + encodedSalt);
+
+        boolean success = userService.registerUser(new User(email, encodedPassword, encodedSalt));
         String message = "Status: ";
         message += success ? "Success!" : "Failure";
         model.addAttribute("message", message);
+        model.addAttribute("message", "success");
         return "register";
     }
 
@@ -62,7 +92,9 @@ public class HomeController {
         String email = decoded.split(":")[0];
         String password = decoded.split(":")[1];
         String hashedPass = DigestUtils.md5DigestAsHex(password.getBytes());
-        boolean loginSuccess = userService.loginUser(new User(email, hashedPass));
+//        boolean loginSuccess = userService.loginUser(new User(email, hashedPass));
+//        boolean loginSuccess = true;
+
         if (loginSuccess) {
             return new ModelAndView("profile", HttpStatus.OK);
         } else {
