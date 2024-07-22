@@ -91,8 +91,7 @@ public class HomeController {
         String decoded = new String(Base64.getDecoder().decode(encoded.getBytes()));
         String email = decoded.split(":")[0];
         String password = decoded.split(":")[1];
-        String hashedPass = DigestUtils.md5DigestAsHex(password.getBytes());
-//        boolean loginSuccess = userService.loginUser(new User(email, hashedPass));
+        boolean loginSuccess = userService.loginUser(email, password);
 //        boolean loginSuccess = true;
 
         if (loginSuccess) {

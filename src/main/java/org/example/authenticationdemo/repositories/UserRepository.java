@@ -34,13 +34,16 @@ public class UserRepository {
         return !returned.isEmpty();
     }
 
-    public void findUserByEmail(String email) {
+    public User findUserByEmail(String email) {
         String sql = "SELECT * FROM users WHERE email = '" + email + "'";
+
+        User user = null;
         try {
-            jdbcTemplate.queryForList(sql);
+            user = jdbcTemplate.queryForObject(sql, (rs, row) -> new User(rs.getString("email"), rs.getString("password"), rs.getString("salt")));
         } catch (EmptyResultDataAccessException e) {
             System.out.println("Nothing found");
             System.out.println(e.getMessage());
         }
+        return user;
     }
 }
