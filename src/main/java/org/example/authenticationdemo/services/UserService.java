@@ -6,21 +6,39 @@ import org.springframework.stereotype.Service;
 
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
-import java.sql.SQLOutput;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Base64;
-
-import static java.util.Base64.getDecoder;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+    private final SecureRandom secureRandom;
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
+        this.secureRandom = new SecureRandom();
     }
 
-    public boolean registerUser(User user) {
+    public boolean registerUser(String email, String password) {
+        // get a new salt
+        byte[] salt = getNewSalt();
+
+        // apply salt to user password
+        byte[] saltedPassword = addSaltToPassword(password, salt);
+
+        // hash the salted password
+        byte[] hashedSaltedPassword = hashSaltedPassword(saltedPassword);
+
+        // encode the salt and the hashed salted password
+        Base64.Encoder encoder = Base64.getEncoder();
+        String encodedPassword = encoder.encodeToString(hashedSaltedPassword);
+        String encodedSalt = encoder.encodeToString(salt);
+
+        // create user object
+        User user = new User(email, encodedPassword, encodedSalt);
+
         return userRepository.insert(user);
     }
 
@@ -63,9 +81,15 @@ public class UserService {
         MessageDigest md = null;
         try {
             md = MessageDigest.getInstance("MD5");
-        } catch (Exception e) {
-            System.out.println("never should occur");
+        } catch (NoSuchAlgorithmException _) {
+            // should never happen because "MD5" is a known hashing algorithm
         }
         return md.digest(saltedPassword);
+    }
+
+    private byte[] getNewSalt() {
+        byte[] salt = new byte[64];
+        secureRandom.nextBytes(salt);
+        return salt;
     }
 }
